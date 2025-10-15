@@ -72,7 +72,7 @@ for _ in range (number):
         best_position = None
         best_rotation = None
 
-        #1: calculates all possibilities
+        #Calculates all possibilities
         for rotations in range(4):
             temp_piece = copy.deepcopy(current_piece)
             temp_piece.x = 0
@@ -102,7 +102,7 @@ for _ in range (number):
                     best_rotation = rotations
                     best_position = column
         
-        #2: applies the best one
+        #Applies the best one
         for _ in range(best_rotation):
             current_piece.rotate_right()
         current_piece.x = best_position
@@ -110,15 +110,14 @@ for _ in range (number):
         while not Collision.collision_piece_bottom(current_piece,board):
             current_piece.y += 1
             score += 2
+            #This prints the board in the terminal each time the piece falls. Can be moved or removed
             Functions.print_board_terminal(current_piece,board)
             time.sleep(0.05)
-
-
-
+    
         board = Functions.lockBoard(current_piece,board)
         board,_ = Functions.clear_lines(board)
 
-        #3: Updates the Q_table and the pieces
+        #Updates the Q_table and the pieces
         current_piece = next_piece
         current_piece_type = next_piece_type
         next_piece_type = random.choice(Pieces_list)
