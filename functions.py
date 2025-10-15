@@ -49,10 +49,8 @@ class Functions():
         self.shape = [list(row) for row in rotated_left]
 
     def print_board_terminal(piece, board):
-    # Make a copy of the board so we don't modify the original
         temp_board = [row[:] for row in board]
 
-        # Overlay the piece
         if piece:
             shape = piece.shape
             for i, row in enumerate(shape):
@@ -63,32 +61,10 @@ class Functions():
                         if 0 <= board_y < len(temp_board) and 0 <= board_x < len(temp_board[0]):
                             temp_board[board_y][board_x] = 1
 
-        # Print the board
         for row in temp_board:
             line = ''.join('#' if cell == 1 else '.' for cell in row)
             print(line)
     
-    def print_board(piece, board):
-        temp_board = [row[:] for row in board]
-
-        if piece:
-            shape = piece.shape
-            x, y = piece.x, piece.y
-            for i, row in enumerate(shape):
-                for j, cell in enumerate(row):
-                    if cell == 1:
-                        if 0 <= y + i < len(temp_board) and 0 <= x + j < len(temp_board[0]):
-                            temp_board[y + i][x + j] = 1
-
-        for row in temp_board:
-            line = ''
-            for cell in row:
-                if cell == 1 or cell == 1:
-                    line += 1
-                else:
-                    line += 0
-        return temp_board
-
     def lockBoard(piece, board):
         for i, row in enumerate(piece.shape):
             for j, cell in enumerate(row):
@@ -108,7 +84,6 @@ class Functions():
         piece.x -= 1
 
     def endgame(piece, board):
-        # Game over if newly spawned piece collides immediately
         for i, row in enumerate(piece.shape):
             for j, cell in enumerate(row):
                 if cell == 1:
@@ -198,9 +173,9 @@ class Functions():
 
     def compute_reward(current_piece,board, lines_cleared,state):
         # Extract board features
-        height = state[:10]  # list of 10 heights
-        holes = Functions.count_holes(board)          # number of empty cells with blocks above
-        bumpiness = Functions.bumpiness(height)      # sum of height differences between adjacent columns
+        height = state[:10] 
+        holes = Functions.count_holes(board)         
+        bumpiness = Functions.bumpiness(height)      
         
         reward = 0
 
@@ -218,7 +193,6 @@ class Functions():
         elif lines_cleared == 4:
             reward += 800  # Tetris
 
-        # Penalties for bad board features
         reward -= (0.5 * holes + 0.3 * bumpiness + 0.2 * max(height))
 
         return reward
