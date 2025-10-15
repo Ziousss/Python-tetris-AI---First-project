@@ -6,7 +6,7 @@ class Collision():
         self.x = x
         self.y = y
             
-    #Checks if u can rotate right without going outside of the board
+    #Checks if the piece can rotate right
     def collision_rotation_right(piece, board):
         temp_piece = copy.deepcopy(piece)
         
@@ -25,7 +25,7 @@ class Collision():
         if rotate:
             return False
     
-    #Checks if u can rotate left   
+    #Checks if the piece can rotate left   
     def collision_rotation_left(piece, board):
         temp_piece = copy.deepcopy(piece)
         
@@ -44,48 +44,45 @@ class Collision():
         if rotate:
             return False   
 
-
+    #Checks if the piece can fall
     def collision_piece_bottom(piece, board):
         for i, row in enumerate(piece.shape):
             for j, cell in enumerate(row):
                 if cell == 1:
-                    # Check if piece itself is already out of bounds
                     if piece.y + i >= len(board):
                         return True
                         
-                    # Check if next position would be out of bounds
                     if piece.y + i + 1 >= len(board):
                         return True
                     
-                    # Check for collision with other pieces
                     if piece.x + j >= 10 or piece.x + j < 0:
                         return True
-                        
+                
                     if board[piece.y + i + 1][piece.x + j] == 1:
                         return True
         return False
         
-    #Checks for collision with the right side of the board when going right
-    def collision_sides(piece, board):
+    #Checks for collision with the right side
+    def collision_sides_right(piece, board):
         for i, row in enumerate(piece.shape):
             for j, cell in enumerate(row):
                 if cell == 1:
-                    # right boundary
                     if piece.x + j >= len(board[0]) or piece.x + j < 0:
-                        return True  # collision
-                    # cell occupied
+                        return True  
+                    
                     if 0 <= piece.y + i < len(board):
                         if board[piece.y + i][piece.x + j] == 1:
                             return True
-        return False  # no collision
+        return False 
 
+    #Checks for collision with the right side
     def collision_sides_left(piece, board):
         for i, row in enumerate(piece.shape):
             for j, cell in enumerate(row):
                 if cell == 1:
                     if piece.x + j - 1 < 0:
-                        return True  # collision
+                        return True  
                     if piece.y + i < len(board):
                         if board[piece.y + i][piece.x + j - 1] == 1:
                             return True
-        return False  # no collision
+        return False 
