@@ -197,7 +197,7 @@ class Functions():
 
         return reward
     
-    def compute_reward_geneticAI(current_piece, board, lines_cleared, state, weight):
+    def compute_reward_geneticAI(current_piece, board, lines_cleared, state, weights):
         # Extract board features
         height = state[:10] 
         holes = Functions.count_holes(board)         
@@ -209,7 +209,7 @@ class Functions():
         if Functions.endgame(current_piece,board):
             reward -= 500
 
-        reward -= (0.5 * holes + 0.3 * bumpiness + 0.2 * max(height) + lines_cleared * weight["lines_weight"])
+        reward -= (weights["holes"] * holes + weights["bumpiness"] * bumpiness + weights["height"] * max(height) + lines_cleared * weights["lines_weight"])
 
         return reward
     
