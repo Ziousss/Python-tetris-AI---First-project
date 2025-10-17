@@ -37,8 +37,6 @@ PIECES = {
         (0,1,1)
     ]
 }
-current_piece = Functions(PIECES[random.choice(Pieces_list)],x=4,y=0)
-next_piece = Functions(PIECES[random.choice(Pieces_list)],x=4,y=0)
 
 Q_table = {}
 
