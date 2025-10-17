@@ -41,6 +41,12 @@ PIECES = {
 generation = 100
 individuals = 1000
 
+weights = {
+    "lines": random.uniform(-5,5),
+    "holes": random.uniform(-5,5),
+    "height": random.uniform(-5,5),
+    "bumpiness": random.uniform(-5,5)
+}
 
 
 
@@ -90,7 +96,7 @@ for i in range(generation):
                     state = Functions.make_state(temp_board,next_piece_type)
                     score, back_to_back = Functions.score_count(lines_cleared,back_to_back)
 
-                    reward = Functions.compute_reward(current_piece,temp_board,lines_cleared,state) + score
+                    reward = Functions.compute_reward_geneticAI(current_piece,temp_board,lines_cleared,state, weights) + score
                     if reward > best_score:
                         best_score = reward
                         best_rotation = rotations
