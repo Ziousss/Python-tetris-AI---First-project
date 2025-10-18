@@ -103,8 +103,6 @@ for _ in range (number):
         while not Collision.collision_piece_bottom(current_piece,board):
             current_piece.y += 1
             score += 2
-            Functions.print_board_terminal(None, board)
-            time.sleep(0.05)
             
     
         board = Functions.lockBoard(current_piece,board)
@@ -120,7 +118,7 @@ for _ in range (number):
 
         if Functions.endgame(current_piece,board):
             break
-    
+    print(_)
     if total_score < 5000:
         print(f"Low score game: {total_score}")
         print(f"Final board state:")
