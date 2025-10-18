@@ -86,7 +86,6 @@ class Functions():
         piece.x -= 1
 
     def endgame(piece, board):
-        """Check if piece collides with board at spawn position"""
         for i, row in enumerate(piece.shape):
             for j, cell in enumerate(row):
                 if cell != 1:
@@ -94,6 +93,9 @@ class Functions():
                 y = piece.y + i
                 x = piece.x + j
                 
+                if board[0][j] == 1:
+                    return True
+
                 # Check if piece overlaps with existing blocks
                 if 0 <= y < len(board) and 0 <= x < len(board[0]):
                     if board[y][x] == 1:
@@ -292,9 +294,7 @@ class Functions():
                     state = Functions.make_state(temp_board, next_piece_type)
                     score, back_to_back_temp = Functions.score_count(lines_cleared, back_to_back)
                     
-                    reward = Functions.compute_reward_geneticAI(
-                        temp_piece, temp_board, lines_cleared, state, weights
-                    ) + score
+                    reward = Functions.compute_reward_geneticAI(temp_piece, temp_board, lines_cleared, state, weights) + score
                     
                     if reward > best_score:
                         best_score = reward
