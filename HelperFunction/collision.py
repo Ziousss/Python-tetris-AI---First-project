@@ -48,19 +48,23 @@ class Collision():
     def collision_piece_bottom(piece, board):
         for i, row in enumerate(piece.shape):
             for j, cell in enumerate(row):
-                if cell == 1:
-                    if piece.y + i >= len(board):
-                        return True
-                        
-                    if piece.y + i + 1 >= len(board):
-                        return True
-                    
-                    if piece.x + j >= 10 or piece.x + j < 0:
-                        return True
-                
-                    if board[piece.y + i + 1][piece.x + j] == 1:
-                        return True
+                if cell != 1:
+                    continue
+
+                y = piece.y + i
+                x = piece.x + j
+
+                if y + 1 >= len(board):
+                    return True
+
+                if y < 0:
+                    continue
+
+                if board[y + 1][x] == 1:
+                    return True
+
         return False
+
         
     #Checks for collision with the right side
     def collision_sides_right(piece, board):
