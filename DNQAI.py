@@ -140,7 +140,7 @@ for i in range(generation):
         population[j]["fitness"] = total_score
 
         with open("genetic_Bot_AI.txt", "a") as f:
-            f.write(f"Generation {i} Bot {j}, score = {total_score}")
+            f.write(f"Generation {i} Bot {j}, score = {total_score}\n")
 
     # Creates the new generation
     population = sorted(population, key=lambda x: x["fitness"], reverse=True)
