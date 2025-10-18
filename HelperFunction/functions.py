@@ -1,4 +1,6 @@
 from HelperFunction.collision import Collision
+import random
+import time
 
 board = [[0 for _ in range(10)] for _ in range (20)]
 Pieces_list = ['I','L','J','O','T','S','Z']
@@ -237,3 +239,61 @@ class Functions():
         for item in range(9):
             total += abs(state[item] - state[item+1])
         return total
+    
+    def play_with_weights(weights, display=False):
+        current_piece_type = random.choice(Pieces_list)
+        current_piece = Functions(PIECES[current_piece_type], x=4, y=0)
+        next_piece_type = random.choice(Pieces_list)
+        next_piece = Functions(PIECES[next_piece_type], x=4, y=0)
+        board = [[0 for _ in range(10)] for _ in range(20)]
+        back_to_back = False
+
+        while True:
+            best_score = -float('inf')
+            best_rotation = best_position = None
+
+            # Try all rotations/positions (same logic as before)
+            if current_piece_type == 'O':
+                max_rotations = 1
+            elif current_piece_type == 'I':
+                max_rotations = 2
+            else:
+                max_rotations = 4
+
+            for r in range(max_rotations):
+                temp_piece = Functions(PIECES[current_piece_type], x=4, y=0)
+                for _ in range(r):
+                    temp_piece.rotate_right()
+                for column in range(0, 10 - len(temp_piece.shape[0]) + 1):
+                    temp_board = [row[:] for row in board]
+                    temp_piece.x = column
+                    temp_piece.y = 0
+                    while not Collision.collision_piece_bottom(temp_piece, temp_board):
+                        temp_piece.y += 1
+                    temp_board = Functions.lockBoard(temp_piece, temp_board)
+                    temp_board, lines = Functions.clear_lines(temp_board)
+                    score, back_to_back = Functions.score_count(lines, back_to_back)
+                    state = Functions.make_state(temp_board, next_piece_type)
+                    reward = Functions.compute_reward_geneticAI(current_piece, temp_board, lines, state, weights) + score
+                    if reward > best_score:
+                        best_score, best_rotation, best_position = reward, r, column
+
+            # Apply best move
+            for _ in range(best_rotation):
+                current_piece.rotate_right()
+            current_piece.x = best_position
+            while not Collision.collision_piece_bottom(current_piece, board):
+                current_piece.y += 1
+                Functions.print_board_terminal(current_piece, board)
+                time.sleep(0.05)
+            board = Functions.lockBoard(current_piece, board)
+            board, _ = Functions.clear_lines(board)
+
+            # Next piece
+            current_piece = next_piece
+            current_piece_type = next_piece_type
+            next_piece_type = random.choice(Pieces_list)
+            next_piece = Functions(PIECES[next_piece_type], x=4, y=0)
+
+            if Functions.endgame(current_piece, board):
+                break
