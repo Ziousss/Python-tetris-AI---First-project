@@ -36,8 +36,8 @@ PIECES = {
     ]
 }
 
-generation = 500
-individuals = 1000
+generation = 100
+individuals = 200
 
 population = []
 for _ in range(individuals):  
@@ -149,21 +149,19 @@ for i in range(generation):
     avg_fit = sum(p["fitness"] for p in population) / len(population)
 
     with open("geneticAI.txt","a") as f:
-        f.write(f"Generation {i}: Best = {best_fit:.2f}, Avg = {avg_fit:.2f}")
-
-    print(f"Generation {i+1}: Best = {best_fit:.2f}, Avg = {avg_fit:.2f}\n")
+        f.write(f"Generation {i}: Best = {best_fit:.2f}, Avg = {avg_fit:.2f}\n")
 
     #Optional: prints in the terminal a game of the best and worst bot of this generation
     if i % 10 == 0:  # every 10 generations
         print(f"Displaying best AI of generation {i}...")
         Functions.play_with_weights(population[0]["weights"])
-        print(f"Displaying worst AI of generation {i}...")
-        Functions.play_with_weights(population[-1]["weights"])
 
-    new_pop = population[:200]
-    for _ in range(800):
-        i1 = random.randrange(0, 200)
-        i2 = random.randrange(0, 200)
+    variable = individuals // 5
+    new_pop = population[:variable]
+
+    for _ in range(individuals-variable):
+        i1 = random.randrange(0, variable)
+        i2 = random.randrange(0, variable)
         weights = {
             "lines":(new_pop[i1]["weights"]["lines"] + new_pop[i2]["weights"]["lines"]) / 2,
             "holes": (new_pop[i1]["weights"]["holes"] + new_pop[i2]["weights"]["holes"]) / 2,
