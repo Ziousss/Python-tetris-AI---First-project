@@ -1,4 +1,4 @@
-These results were obtained with 100 generations of 200 individuals
+These results were obtained with 100 generations of 200 individuals and 0.1 mutation
 
 Generation 0 Bot 0, score = 153
 Generation 0 Bot 10, score = 1596

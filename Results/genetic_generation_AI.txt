@@ -1,4 +1,4 @@
-These results were obtained with 100 generations of 200 individuals
+These results were obtained with 100 generations of 200 individuals and 0.1 mutation
 
 Generation 0: Best = 40203.00, best weight = {'lines': -0.850630823622776, 'holes': 1.7600457751458376, 'height': 0.9358764168815523, 'bumpiness': 0.1822697729162046}, Avg = 1044.74
 Generation 1: Best = 25978.00, best weight = {'lines': -0.9417601016566994, 'holes': 1.4451202895266544, 'height': 0.0234378936580959, 'bumpiness': 0.36220677191829465}, Avg = 3728.74
