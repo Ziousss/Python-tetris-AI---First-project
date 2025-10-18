@@ -139,8 +139,9 @@ for i in range(generation):
         print(f"Bot {j} gen {i} finished with score: {total_score}")
         population[j]["fitness"] = total_score
 
-        with open("genetic_Bot_AI.txt", "a") as f:
-            f.write(f"Generation {i} Bot {j}, score = {total_score}\n")
+        if j%10 == 0:
+            with open("genetic_Bot_AI.txt", "a") as f:
+                f.write(f"Generation {i} Bot {j}, score = {total_score}\n")
 
     # Creates the new generation
     population = sorted(population, key=lambda x: x["fitness"], reverse=True)
@@ -149,11 +150,7 @@ for i in range(generation):
     avg_fit = sum(p["fitness"] for p in population) / len(population)
 
     with open("genetic_generation_AI.txt", "a") as f:
-        f.write(f"Generation {i}: Best = {best_fit:.2f}, Avg = {avg_fit:.2f}\n")
-
-    # Optional: prints in the terminal a game of the best and worst bot of this generation 
-    print(f"Displaying best AI of generation {i}...")
-    Functions.play_with_weights(population[0]["weights"])
+        f.write(f"Generation {i}: Best = {best_fit:.2f}, best weight = {population[0]["weights"]}, Avg = {avg_fit:.2f}\n")
 
     variable = individuals // 5
     new_pop = population[:variable]
