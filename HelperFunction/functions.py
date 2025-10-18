@@ -86,14 +86,21 @@ class Functions():
         piece.x -= 1
 
     def endgame(piece, board):
+        """Check if piece collides with board at spawn position"""
         for i, row in enumerate(piece.shape):
             for j, cell in enumerate(row):
-                if cell == 1:
-                    if piece.y + i < 0 or piece.y + i >= 20:
-                        return True
-                    if board[piece.y + i][piece.x + j] == 1:
+                if cell != 1:
+                    continue
+                y = piece.y + i
+                x = piece.x + j
+                
+                # Check if piece overlaps with existing blocks
+                if 0 <= y < len(board) and 0 <= x < len(board[0]):
+                    if board[y][x] == 1:
                         return True
         return False
+
+
     
     def moveDown(piece,board):
         if not Collision.collision_piece_bottom(piece, board):
@@ -181,11 +188,9 @@ class Functions():
         
         reward = 0
 
-        # Game over penalty
         if Functions.endgame(current_piece,board):
             reward -= 500
 
-        # Reward for line clears
         if lines_cleared == 1:
             reward += 100
         elif lines_cleared == 2:
@@ -207,11 +212,10 @@ class Functions():
         
         reward = 0
 
-        # Game over penalty
         if Functions.endgame(current_piece,board):
             reward -= 500
 
-        reward -= (weights["holes"] * holes + weights["bumpiness"] * bumpiness + weights["height"] * max(height) + lines_cleared * weights["lines_weight"])
+        reward -= (weights["holes"] * holes + weights["bumpiness"] * bumpiness + weights["height"] * max(height) + lines_cleared * weights["lines"])
 
         return reward
     
@@ -240,60 +244,85 @@ class Functions():
             total += abs(state[item] - state[item+1])
         return total
     
-    def play_with_weights(weights, display=False):
+    def play_with_weights(weights):
+
         current_piece_type = random.choice(Pieces_list)
         current_piece = Functions(PIECES[current_piece_type], x=4, y=0)
         next_piece_type = random.choice(Pieces_list)
         next_piece = Functions(PIECES[next_piece_type], x=4, y=0)
         board = [[0 for _ in range(10)] for _ in range(20)]
+        
         back_to_back = False
-
+        total_score = 0
+        total_lines_cleared = 0
+        pieces_placed = 0
+        
         while True:
-            best_score = -float('inf')
-            best_rotation = best_position = None
-
-            # Try all rotations/positions (same logic as before)
+            # Calculates all possibilities
             if current_piece_type == 'O':
                 max_rotations = 1
             elif current_piece_type == 'I':
                 max_rotations = 2
             else:
                 max_rotations = 4
-
-            for r in range(max_rotations):
+            
+            best_score = -float('inf')
+            best_rotation = None
+            best_position = None
+            
+            for rotations in range(max_rotations):
                 temp_piece = Functions(PIECES[current_piece_type], x=4, y=0)
-                for _ in range(r):
+                
+                for _ in range(rotations):
                     temp_piece.rotate_right()
+                
                 for column in range(0, 10 - len(temp_piece.shape[0]) + 1):
                     temp_board = [row[:] for row in board]
                     temp_piece.x = column
                     temp_piece.y = 0
+                    
                     while not Collision.collision_piece_bottom(temp_piece, temp_board):
+                        piece_height = len(temp_piece.shape)
+                        if temp_piece.y + piece_height >= 20:
+                            break
                         temp_piece.y += 1
-                    temp_board = Functions.lockBoard(temp_piece, temp_board)
-                    temp_board, lines = Functions.clear_lines(temp_board)
-                    score, back_to_back = Functions.score_count(lines, back_to_back)
-                    state = Functions.make_state(temp_board, next_piece_type)
-                    reward = Functions.compute_reward_geneticAI(current_piece, temp_board, lines, state, weights) + score
-                    if reward > best_score:
-                        best_score, best_rotation, best_position = reward, r, column
 
-            # Apply best move
+                    temp_board = Functions.lockBoard(temp_piece, temp_board)
+                    temp_board, lines_cleared = Functions.clear_lines(temp_board)
+                    state = Functions.make_state(temp_board, next_piece_type)
+                    score, back_to_back_temp = Functions.score_count(lines_cleared, back_to_back)
+                    
+                    reward = Functions.compute_reward_geneticAI(
+                        temp_piece, temp_board, lines_cleared, state, weights
+                    ) + score
+                    
+                    if reward > best_score:
+                        best_score = reward
+                        best_rotation = rotations
+                        best_position = column
+            
+            # Applies the best move
             for _ in range(best_rotation):
                 current_piece.rotate_right()
             current_piece.x = best_position
+            
             while not Collision.collision_piece_bottom(current_piece, board):
                 current_piece.y += 1
-                Functions.print_board_terminal(current_piece, board)
-                time.sleep(0.05)
-            board = Functions.lockBoard(current_piece, board)
-            board, _ = Functions.clear_lines(board)
+                Functions.print_board_terminal(current_piece,board)
+                time.sleep(0.01)
 
-            # Next piece
+            board = Functions.lockBoard(current_piece, board)
+            board, lines_cleared = Functions.clear_lines(board)
+            
+            score, back_to_back = Functions.score_count(lines_cleared, back_to_back)
+            pieces_placed += 1
+            total_score += score + pieces_placed  
+            total_lines_cleared += lines_cleared
+            
             current_piece = next_piece
             current_piece_type = next_piece_type
             next_piece_type = random.choice(Pieces_list)
             next_piece = Functions(PIECES[next_piece_type], x=4, y=0)
-
+            
             if Functions.endgame(current_piece, board):
                 break
