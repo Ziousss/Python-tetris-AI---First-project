@@ -1,8 +1,6 @@
 from HelperFunction.functions import Functions
 import random
-import copy
 from HelperFunction.collision import Collision
-import numpy
 import time
 Pieces_list = ['I','L','J','O','T','S','Z']
 PIECES = {
