@@ -121,11 +121,13 @@ for i in range(generation):
             board = Functions.lockBoard(current_piece, board)
             board, lines_cleared = Functions.clear_lines(board)
 
+            board = Functions.lockBoard(current_piece, board)
+            board, lines_cleared = Functions.clear_lines(board)
+
             score, back_to_back = Functions.score_count(lines_cleared, back_to_back)
             count += 1  # values long game
             total_score += score + count
 
-            # Prepare for next piece
             current_piece = next_piece
             current_piece_type = next_piece_type
             next_piece_type = random.choice(Pieces_list)
@@ -137,19 +139,21 @@ for i in range(generation):
         print(f"Bot {j} gen {i} finished with score: {total_score}")
         population[j]["fitness"] = total_score
 
+        with open("genetic_Bot_AI.txt", "a") as f:
+            f.write(f"Generation {i} Bot {j}, score = {total_score}")
+
     # Creates the new generation
     population = sorted(population, key=lambda x: x["fitness"], reverse=True)
 
     best_fit = population[0]["fitness"]
     avg_fit = sum(p["fitness"] for p in population) / len(population)
 
-    with open("geneticAI.txt", "a") as f:
+    with open("genetic_generation_AI.txt", "a") as f:
         f.write(f"Generation {i}: Best = {best_fit:.2f}, Avg = {avg_fit:.2f}\n")
 
-    # Optional: prints in the terminal a game of the best and worst bot of this generation
-    if i % 10 == 0: 
-        print(f"Displaying best AI of generation {i}...")
-        Functions.play_with_weights(population[0]["weights"])
+    # Optional: prints in the terminal a game of the best and worst bot of this generation 
+    print(f"Displaying best AI of generation {i}...")
+    Functions.play_with_weights(population[0]["weights"])
 
     variable = individuals // 5
     new_pop = population[:variable]
