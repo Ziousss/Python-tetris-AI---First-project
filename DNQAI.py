@@ -27,7 +27,7 @@ PIECES = {
         (0,1,0)
     ],
     'S': [
-        (0,1,1,0),
+        (0,1,1),
         (1,1,0)
     ],
     'Z': [
@@ -50,28 +50,24 @@ for _ in range(individuals):
     population.append({"weights": weights, "fitness": 0})
 
 
-
 for i in range(generation):
-    #Looping through every bot
+    # Looping through every bot
     for j in range(individuals):
         weights = population[j]["weights"]
         current_piece_type = random.choice(Pieces_list)
-        current_piece = Functions(PIECES[current_piece_type],x=4,y=0)
+        current_piece = Functions(PIECES[current_piece_type], x=4, y=0)
         next_piece_type = random.choice(Pieces_list)
-        next_piece = Functions(PIECES[next_piece_type],x=4,y=0)
+        next_piece = Functions(PIECES[next_piece_type], x=4, y=0)
 
-        board = [[0 for _ in range(10)] for _ in range (20)]
+        board = [[0 for _ in range(10)] for _ in range(20)]
 
         back_to_back = False
         total_score = 0
         count = 0
 
-        #Game itself
+        # Game itself
         while True:
-            reward = 0
-            score = 0
-
-            #Calculates all possibilities
+            # Calculates all possibilities
             if current_piece_type == 'O':
                 max_rotations = 1
             elif current_piece_type == 'I':
@@ -84,7 +80,7 @@ for i in range(generation):
             best_position = None
 
             for rotations in range(max_rotations):
-                temp_piece = Functions(PIECES[current_piece_type],x=4,y=0)
+                temp_piece = Functions(PIECES[current_piece_type], x=4, y=0)
 
                 for _ in range(rotations):
                     temp_piece.rotate_right()
@@ -105,76 +101,76 @@ for i in range(generation):
                     temp_board = Functions.lockBoard(temp_piece, temp_board)
                     temp_board, lines_cleared = Functions.clear_lines(temp_board)
                     state = Functions.make_state(temp_board, next_piece_type)
-                    score, back_to_back = Functions.score_count(lines_cleared, back_to_back)
+                    score, back_to_back_temp = Functions.score_count(lines_cleared, back_to_back)
 
-                    reward = Functions.compute_reward_geneticAI(current_piece, temp_board, lines_cleared, state, weights) + score
+                    reward = Functions.compute_reward_geneticAI(temp_piece, temp_board, lines_cleared, state, weights) + score
 
                     if reward > best_score:
                         best_score = reward
                         best_rotation = rotations
                         best_position = column
-                
-            #Applies the best one
+            
+            # Applies the best one
             for _ in range(best_rotation):
                 current_piece.rotate_right()
             current_piece.x = best_position
 
-            while not Collision.collision_piece_bottom(current_piece,board):
+            while not Collision.collision_piece_bottom(current_piece, board):
                 current_piece.y += 1
-                score += 2
-                    
-            
-            board = Functions.lockBoard(current_piece,board)
-            board,_ = Functions.clear_lines(board)
 
-            #Prepares for next piece
+            board = Functions.lockBoard(current_piece, board)
+            board, lines_cleared = Functions.clear_lines(board)
+
+            score, back_to_back = Functions.score_count(lines_cleared, back_to_back)
+            count += 1  # values long game
+            total_score += score + count
+
+            # Prepare for next piece
             current_piece = next_piece
             current_piece_type = next_piece_type
             next_piece_type = random.choice(Pieces_list)
-            next_piece = Functions(PIECES[next_piece_type],x=4,y=0)
-            count += 1 # values long game
-
-            total_score += score + count
-
-            if Functions.endgame(current_piece,board):
+            next_piece = Functions(PIECES[next_piece_type], x=4, y=0)
+            
+            if Functions.endgame(current_piece, board):
                 break
 
+        print(f"Bot {j} gen {i} finished with score: {total_score}")
         population[j]["fitness"] = total_score
 
-
-    #Creates the new generation
+    # Creates the new generation
     population = sorted(population, key=lambda x: x["fitness"], reverse=True)
 
     best_fit = population[0]["fitness"]
     avg_fit = sum(p["fitness"] for p in population) / len(population)
 
-    with open("geneticAI.txt","a") as f:
+    with open("geneticAI.txt", "a") as f:
         f.write(f"Generation {i}: Best = {best_fit:.2f}, Avg = {avg_fit:.2f}\n")
 
-    #Optional: prints in the terminal a game of the best and worst bot of this generation
-    if i % 10 == 0:  # every 10 generations
+    # Optional: prints in the terminal a game of the best and worst bot of this generation
+    if i % 10 == 0: 
         print(f"Displaying best AI of generation {i}...")
         Functions.play_with_weights(population[0]["weights"])
 
     variable = individuals // 5
     new_pop = population[:variable]
 
-    for _ in range(individuals-variable):
+    for _ in range(individuals - variable):
         i1 = random.randrange(0, variable)
         i2 = random.randrange(0, variable)
         weights = {
-            "lines":(new_pop[i1]["weights"]["lines"] + new_pop[i2]["weights"]["lines"]) / 2,
+            "lines": (new_pop[i1]["weights"]["lines"] + new_pop[i2]["weights"]["lines"]) / 2,
             "holes": (new_pop[i1]["weights"]["holes"] + new_pop[i2]["weights"]["holes"]) / 2,
             "height": (new_pop[i1]["weights"]["height"] + new_pop[i2]["weights"]["height"]) / 2,
             "bumpiness": (new_pop[i1]["weights"]["bumpiness"] + new_pop[i2]["weights"]["bumpiness"]) / 2
-            }
+        }
 
         for key in weights:
             if random.random() < 0.1:  # 10% chance to mutate
                 weights[key] += random.uniform(-0.2, 0.2)
 
-        new_pop.append({"weights":weights, "fitness": 0})
+        new_pop.append({"weights": weights, "fitness": 0})
     
     population = new_pop
 
-
+print("Training complete!")
+print(f"Best weights: {population[0]['weights']}")
