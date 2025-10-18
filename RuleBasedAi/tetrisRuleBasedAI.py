@@ -1,10 +1,9 @@
 from HelperFunction.functions import Functions
 import random
-import time
 import copy
 from HelperFunction.collision import Collision
-
-board = [[0 for _ in range(10)] for _ in range (20)]
+import numpy
+import time
 Pieces_list = ['I','L','J','O','T','S','Z']
 PIECES = {
     'I': [
@@ -72,9 +71,7 @@ for _ in range (number):
 
         #Calculates all possibilities
         for rotations in range(4):
-            temp_piece = copy.deepcopy(current_piece)
-            temp_piece.x = 0
-            temp_piece.y = 0
+            temp_piece = Functions(PIECES[current_piece_type],x=4,y=0)
             for _ in range(rotations):
                 temp_piece.rotate_right()
 
@@ -108,6 +105,8 @@ for _ in range (number):
         while not Collision.collision_piece_bottom(current_piece,board):
             current_piece.y += 1
             score += 2
+            Functions.print_board_terminal(None, board)
+            time.sleep(0.05)
             
     
         board = Functions.lockBoard(current_piece,board)
