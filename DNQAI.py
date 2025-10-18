@@ -38,21 +38,40 @@ PIECES = {
     ]
 }
 
-generation = 100
+generation = 500
 individuals = 1000
 
-weights = {
-    "lines": random.uniform(-5,5),
-    "holes": random.uniform(-5,5),
-    "height": random.uniform(-5,5),
-    "bumpiness": random.uniform(-5,5)
-}
-
+population = []
+for _ in range(individuals):  
+    weights = {
+        "lines": random.uniform(-2, 2),
+        "holes": random.uniform(-2, 2),
+        "height": random.uniform(-2, 2),
+        "bumpiness": random.uniform(-2, 2)
+    }
+    population.append({"weights": weights, "fitness": 0})
 
 
 
 for i in range(generation):
-    #prend les 500 meilleurs et les reproduit
+    population = sorted(population, key=lambda x: x["fitness"], reverse=True)
+
+    new_pop = population[:200]
+    for i in range(800):
+        i1 = random.randrange(0, 200)
+        i2 = random.randrange(0, 200)
+        weights = {
+        "lines":(new_pop[i1]["weights"]["lines"] + new_pop[i2]["weights"]["lines"]) / 2,
+        "holes": (new_pop[i1]["weights"]["holes"] + new_pop[i2]["weights"]["holes"]) / 2,
+        "height": (new_pop[i1]["weights"]["height"] + new_pop[i2]["weights"]["height"]) / 2,
+        "bumpiness": (new_pop[i1]["weights"]["bumpiness"] + new_pop[i2]["weights"]["bumpiness"]) / 2
+        }
+
+        for key in weights:
+            if random.random() < 0.1:  # 10% chance to mutate
+                weights[key] += random.uniform(-0.2, 0.2)
+
+        new_pop.append({"weights":weights, "fitness": 0})
 
 
 
