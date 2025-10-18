@@ -3,7 +3,6 @@ import random
 import time
 import copy
 from HelperFunction.collision import Collision
-import numpy
 
 Pieces_list = ['I','L','J','O','T','S','Z']
 PIECES = {
@@ -54,39 +53,19 @@ for _ in range(individuals):
 
 
 for i in range(generation):
-    population = sorted(population, key=lambda x: x["fitness"], reverse=True)
-
-    new_pop = population[:200]
-    for i in range(800):
-        i1 = random.randrange(0, 200)
-        i2 = random.randrange(0, 200)
-        weights = {
-        "lines":(new_pop[i1]["weights"]["lines"] + new_pop[i2]["weights"]["lines"]) / 2,
-        "holes": (new_pop[i1]["weights"]["holes"] + new_pop[i2]["weights"]["holes"]) / 2,
-        "height": (new_pop[i1]["weights"]["height"] + new_pop[i2]["weights"]["height"]) / 2,
-        "bumpiness": (new_pop[i1]["weights"]["bumpiness"] + new_pop[i2]["weights"]["bumpiness"]) / 2
-        }
-
-        for key in weights:
-            if random.random() < 0.1:  # 10% chance to mutate
-                weights[key] += random.uniform(-0.2, 0.2)
-
-        new_pop.append({"weights":weights, "fitness": 0})
-
-
-
+    #Looping through every bot
     for j in range(individuals):
-        #Fait la boucle pour chaque individus dans la boucle
         current_piece_type = random.choice(Pieces_list)
         current_piece = Functions(PIECES[current_piece_type],x=4,y=0)
         next_piece_type = random.choice(Pieces_list)
         next_piece = Functions(PIECES[next_piece_type],x=4,y=0)
 
-        board = numpy.zeros((20, 10), dtype=int)
+        board = [[0 for _ in range(10)] for _ in range (20)]
 
         back_to_back = False
         total_score = 0
 
+        #Game itself
         while True:
             reward = 0
             score = 0
@@ -134,31 +113,52 @@ for i in range(generation):
                     best_rotation = rotations
                     best_position = column
                 
-                #Applies the best one
-                for _ in range(best_rotation):
-                    current_piece.rotate_right()
-                current_piece.x = best_position
+            #Applies the best one
+            for _ in range(best_rotation):
+                current_piece.rotate_right()
+            current_piece.x = best_position
 
-                while not Collision.collision_piece_bottom(current_piece,board):
-                    current_piece.y += 1
-                    score += 2
+            while not Collision.collision_piece_bottom(current_piece,board):
+                current_piece.y += 1
+                score += 2
                     
             
-                board = Functions.lockBoard(current_piece,board)
-                board,_ = Functions.clear_lines(board)
+            board = Functions.lockBoard(current_piece,board)
+            board,_ = Functions.clear_lines(board)
 
-                #Updates the Q_table and the pieces
-                current_piece = next_piece
-                current_piece_type = next_piece_type
-                next_piece_type = random.choice(Pieces_list)
-                next_piece = Functions(PIECES[next_piece_type],x=4,y=0)
-                count += 1
+            #Updates the Q_table and the pieces
+            current_piece = next_piece
+            current_piece_type = next_piece_type
+            next_piece_type = random.choice(Pieces_list)
+            next_piece = Functions(PIECES[next_piece_type],x=4,y=0)
+            count += 1
 
-                total_score += score + count
+            total_score += score + count
 
-                if Functions.endgame(current_piece,board):
-                    break
+            if Functions.endgame(current_piece,board):
+                break
 
-            population[j]["fitness"] = total_score
+        population[j]["fitness"] = total_score
+
+        
+    #Creates the new generation
+    population = sorted(population, key=lambda x: x["fitness"], reverse=True)
+
+    new_pop = population[:200]
+    for i in range(800):
+        i1 = random.randrange(0, 200)
+        i2 = random.randrange(0, 200)
+        weights = {
+            "lines":(new_pop[i1]["weights"]["lines"] + new_pop[i2]["weights"]["lines"]) / 2,
+            "holes": (new_pop[i1]["weights"]["holes"] + new_pop[i2]["weights"]["holes"]) / 2,
+            "height": (new_pop[i1]["weights"]["height"] + new_pop[i2]["weights"]["height"]) / 2,
+            "bumpiness": (new_pop[i1]["weights"]["bumpiness"] + new_pop[i2]["weights"]["bumpiness"]) / 2
+            }
+
+        for key in weights:
+            if random.random() < 0.1:  # 10% chance to mutate
+                weights[key] += random.uniform(-0.2, 0.2)
+
+        new_pop.append({"weights":weights, "fitness": 0})
 
 
