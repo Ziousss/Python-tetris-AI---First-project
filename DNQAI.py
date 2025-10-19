@@ -36,8 +36,10 @@ PIECES = {
     ]
 }
 
-generation = 100
-individuals = 200
+generation = 200
+individuals = 500
+mutation = 0.15
+mutation_step = 0.2
 
 population = []
 for _ in range(individuals):  
@@ -51,6 +53,7 @@ for _ in range(individuals):
 
 
 for i in range(generation):
+
     # Looping through every bot
     for j in range(individuals):
         weights = population[j]["weights"]
@@ -121,12 +124,9 @@ for i in range(generation):
             board = Functions.lockBoard(current_piece, board)
             board, lines_cleared = Functions.clear_lines(board)
 
-            board = Functions.lockBoard(current_piece, board)
-            board, lines_cleared = Functions.clear_lines(board)
-
             score, back_to_back = Functions.score_count(lines_cleared, back_to_back)
-            count += 1  # values long game
-            total_score += score + count
+            count += 1  #Values long game
+            total_score += score + count * 0.05 #Clear lines instead of just staying alive
 
             current_piece = next_piece
             current_piece_type = next_piece_type
@@ -154,24 +154,29 @@ for i in range(generation):
 
     variable = individuals // 5
     new_pop = population[:variable]
-
+    i1 = random.randrange(0, variable)
+    i2 = random.randrange(0, variable)
+    
     for _ in range(individuals - variable):
-        i1 = random.randrange(0, variable)
-        i2 = random.randrange(0, variable)
-        weights = {
-            "lines": (new_pop[i1]["weights"]["lines"] + new_pop[i2]["weights"]["lines"]) / 2,
-            "holes": (new_pop[i1]["weights"]["holes"] + new_pop[i2]["weights"]["holes"]) / 2,
-            "height": (new_pop[i1]["weights"]["height"] + new_pop[i2]["weights"]["height"]) / 2,
-            "bumpiness": (new_pop[i1]["weights"]["bumpiness"] + new_pop[i2]["weights"]["bumpiness"]) / 2
-        }
+        if random.random()<0.5:
+            weights = {
+                "lines": (new_pop[i1]["weights"]["lines"] + new_pop[i2]["weights"]["lines"]) / 2,
+                "holes": (new_pop[i1]["weights"]["holes"] + new_pop[i2]["weights"]["holes"]) / 2,
+                "height": (new_pop[i1]["weights"]["height"] + new_pop[i2]["weights"]["height"]) / 2,
+                "bumpiness": (new_pop[i1]["weights"]["bumpiness"] + new_pop[i2]["weights"]["bumpiness"]) / 2
+            }
+        else:
+            weights = random.choice([new_pop[i1],new_pop[i2]])
 
         for key in weights:
-            if random.random() < 0.1:  # 10% chance to mutate
-                weights[key] += random.uniform(-0.2, 0.2)
+            if random.random() < mutation:  
+                weights[key] += random.uniform(-mutation_step, mutation_step)
 
         new_pop.append({"weights": weights, "fitness": 0})
     
     population = new_pop
+    mutation = max(mutation*0.998,0.05)
+    mutation_step = max(mutation_step*0.998,0.1)
 
 print("Training complete!")
 print(f"Best weights: {population[0]['weights']}")
