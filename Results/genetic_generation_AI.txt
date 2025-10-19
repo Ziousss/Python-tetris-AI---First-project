@@ -101,4 +101,4 @@ Generation 97: Best = 75191.00, best weight = {'lines': -0.2694694316141722, 'ho
 Generation 98: Best = 62681.00, best weight = {'lines': -0.3485628974843632, 'holes': 1.6239363864027618, 'height': 0.03823952547249709, 'bumpiness': 0.3499400391724323}, Avg = 15207.19
 Generation 99: Best = 287403.00, best weight = {'lines': -0.3126723234959727, 'holes': 1.590294459585301, 'height': 0.16062744911849028, 'bumpiness': 0.27313884136738026}, Avg = 16646.81
 
-Surprisingly enough, the best of the last generation is wayyyy better than the previous ones. We can see that at first, the wverage jumps very quickly to then hit a plateau around 15k/16k/17k
+Surprisingly enough, the best of the last generation is wayyyy better than the previous ones. We can see that at first, the average jumps very quickly to then hit a plateau around 15k~17k
