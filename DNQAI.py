@@ -37,7 +37,7 @@ PIECES = {
 }
 
 generation = 100
-individuals = 200
+individuals = 50
 mutation = 0.15
 mutation_step = 0.2
 
@@ -158,7 +158,6 @@ for i in range(generation):
             while not Collision.collision_piece_bottom(current_piece,board):
                 current_piece.y += 1
                 count += 1
-                Functions.print_board_terminal(current_piece,board)
                 
             board = Functions.lockBoard(current_piece,board)
             board,line_cleared_def = Functions.clear_lines(board)
