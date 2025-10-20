@@ -1,0 +1,5 @@
+individual 0 has human score 201028
+individual 1 has human score 244464
+individual 2 has human score 5238816
+individual 3 has human score 8194230
+individual 4 has human score 4861220
