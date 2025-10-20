@@ -189,6 +189,7 @@ class Functions():
         bumpiness = Functions.bumpiness(height)      
         
         reward = 0
+        reward -= (0.5 * holes + 0.3 * bumpiness + 0.2 * max(height))
 
         if Functions.endgame(current_piece,board):
             reward -= 500
@@ -198,11 +199,9 @@ class Functions():
         elif lines_cleared == 2:
             reward += 300
         elif lines_cleared == 3:
-            reward += 500
+            reward += 700
         elif lines_cleared == 4:
-            reward += 800  # Tetris
-
-        reward -= (0.5 * holes + 0.3 * bumpiness + 0.2 * max(height))
+            reward += 1200  # Tetris
 
         return reward
     
@@ -213,32 +212,36 @@ class Functions():
         bumpiness = Functions.bumpiness(height)      
         
         reward = 0
+        reward = (lines_cleared * weights["lines"] - holes * weights["holes"] - bumpiness * weights["bumpiness"] - max(height) * weights["height"])
 
         if Functions.endgame(current_piece,board):
             reward -= 500
-
-        reward -= (weights["holes"] * holes + weights["bumpiness"] * bumpiness + weights["height"] * max(height) + lines_cleared * weights["lines"])
-
         return reward
     
     
-    def score_count(line_count, back_to_back):
+    def score_count(line_count, back_to_back, board, level):
         score = 0
+        is_empty = all(cell == 0 for row in board for cell in row)
+
         if line_count == 1:
-            score += 100
+            score += 800*level if is_empty else 100*level
             back_to_back = False
-        if line_count == 2:
-            score += 300
+        elif line_count == 2:
+            score += 1200*level if is_empty else 300*level
             back_to_back = False
-        if line_count == 3:
-            score += 500
+        elif line_count == 3:
+            score += 1800*level if is_empty else 500*level
             back_to_back = False
-        if line_count == 4:
-            score += 800
-            if back_to_back:
-                score += 800
+        elif line_count == 4:  # Tetris
+            score += 2000*level if is_empty else 800*level
+            if back_to_back:  # Back-to-back bonus
+                score += 1200*level
             back_to_back = True
+        else:
+            back_to_back = False
+
         return score, back_to_back
+
     
     def bumpiness(state):
         total = 0
